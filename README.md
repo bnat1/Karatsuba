@@ -29,36 +29,24 @@ The class and a simple driver program are provided in posint.tar.gz. The driver 
 
 For example, the “dumb” way of doing exponentiation might be written in pseudocode as:
 
-1
-2
-3
-4
-5
-def pow(n, k):
-    res = 1
-    for 1 in range(0, k):
-        res = res * n
-    return res
+```1 def pow(n, k):
+2    res = 1
+3    for 1 in range(0, k):
+4        res = res * n
+5    return res```
+
 Writing this in C++ using the PosInt class would look like:
 
-1
-2
-3
-4
-5
-6
-7
-8
-9
-void pow (PosInt& res, const PosInt& n, const PosInt& k) {
-  PosInt i(1);
-  PosInt one(1);
-  res.set(1);
-  while (i.compare(k) <= 0) {
-    res.mul(n);
-    i.add(one);
-  }
-}
+```1 void pow (PosInt& res, const PosInt& n, const PosInt& k) {
+2   PosInt i(1);
+3   PosInt one(1);
+4   res.set(1);
+5   while (i.compare(k) <= 0) {
+6     res.mul(n);
+7     i.add(one);
+8   }
+9 }```
+
 Here are some things to notice:
 
 You can't use the usual C++ operators for arithmetic. So for example to add, you have to use the add method in the PosInt class, not the + operator. This seems annoying, but makes it easier to keep track of exactly what is happening.
