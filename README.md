@@ -66,7 +66,7 @@ Modified posint.cpp implementing Karatsuba's method using the functions describe
 A driver program called driver.cpp that generates timing results for mul and fastMul for arguments of varying size.
 A Makefile that builds the program driver.
 A brief, formal paper describing your implementation of Kartatsuba's method and your analysis to determine the crossover point for “schoolbook” multiplication versus Karatsuba's method. The paper should also include a table of all timing data generated (may be in an Appendix) and a description of the hardware used for testing.
-##Submission
+## Submission
 
 To be determined.
 
