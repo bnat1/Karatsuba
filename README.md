@@ -21,15 +21,16 @@ Once you get fastMul working, you need to determine the performance crossover po
 
 The PosInt Class
 
-In cryptographic applications, we have to perform operations on very large integers that can't be stored within a single int. For example, in RSA we work with integers that are thousands of bits long. There are good, free packages available for doing this that have been developed by researchers around the world. The most popular is GNU's GMP package. However, we're going to use a much smaller multiprecision class developed by Dan Roche at the Naval Academy.
+In cryptographic applications, we have to perform operations on very large integers that can't be stored within a single int. For example, in RSA we work with integers that are thousands of bits long. There are good, free packages available for doing this that have been developed by researchers around the world. The most popular is GNU's [GMP package](https://gmplib.org/). However, we're going to use a much smaller multiprecision class developed by Dan Roche at the Naval Academy.
 
 The C++ class PosInt implements basic multiprecision arithmetic operations, including addition, subraction, multiplication, and integer division with remainder; it also provides functions to create a PosInt object from a char array or integer as well as functions to print a multiprecision integer.
 
-The class and a simple driver program are provided in posint.tar.gz. The driver provides an example of how to create and manipulate multiprecision integers using PosInt. In addition, you can look at the header file posint.h for the PosInt class to see what the interface is like. What you should notice is that you will use multiprecision integers differently than how you would use a regular int.
+The class and a simple driver program are provided in [posint.tar.gz](https://www.csee.umbc.edu/courses/undergraduate/441/spring17_marron/projects/proj1/posint.tar.gz). The driver provides an example of how to create and manipulate multiprecision integers using PosInt. In addition, you can look at the header file posint.h for the PosInt class to see what the interface is like. What you should notice is that you will use multiprecision integers differently than how you would use a regular int.
 
 For example, the “dumb” way of doing exponentiation might be written in pseudocode as:
 
-```1 def pow(n, k):
+```
+1 def pow(n, k):
 2    res = 1
 3    for 1 in range(0, k):
 4        res = res * n
@@ -38,7 +39,8 @@ For example, the “dumb” way of doing exponentiation might be written in pseu
 
 Writing this in C++ using the PosInt class would look like:
 
-```1 void pow (PosInt& res, const PosInt& n, const PosInt& k) {
+```
+1 void pow (PosInt& res, const PosInt& n, const PosInt& k) {
 2   PosInt i(1);
 3   PosInt one(1);
 4   res.set(1);
