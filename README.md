@@ -33,7 +33,8 @@ For example, the “dumb” way of doing exponentiation might be written in pseu
 2    res = 1
 3    for 1 in range(0, k):
 4        res = res * n
-5    return res```
+5    return res
+```
 
 Writing this in C++ using the PosInt class would look like:
 
@@ -45,7 +46,8 @@ Writing this in C++ using the PosInt class would look like:
 6     res.mul(n);
 7     i.add(one);
 8   }
-9 }```
+9 }
+```
 
 Here are some things to notice:
 
