@@ -1,5 +1,5 @@
 PROGS=driver
-HEADERS=posint.h
+HEADERS=posint.hpp
 CPPFLAGS=-O3 -Wall -Wno-sign-compare -Wno-unused-function
 #CPPFLAGS=-Wall -Wextra -Wno-sign-compare -fprofile-arcs -ftest-coverage -g
 
@@ -7,7 +7,7 @@ CPPFLAGS=-O3 -Wall -Wno-sign-compare -Wno-unused-function
 all: $(PROGS)
 
 # Dependencies
-$(PROGS): $(HEADERS:.h=.o)
+$(PROGS): $(HEADERS:.hpp=.o)
 
 # Rules to generate the final compiled program
 $(PROGS): %: %.cpp
