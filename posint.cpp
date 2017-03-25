@@ -291,8 +291,22 @@ void PosInt::mulArray
 // Computes dest = x * y, digit-wise, using Karatsuba's method.
 // x and y have the same length (len)
 // dest must have size (2*len) to store the result.
-static void fastMulArray (int* dest, const int* x, const int* y, int len) {
+void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 
+	// if(x < B || y < B){
+	// 	dest[0] = x.mul(y)
+	// } 
+
+	// int lenOver2 = len / 2;
+
+	// // split up inputs into subarrays
+	// int *low1, *low2, *high1, *high2, *z0, *z1, *z2;
+
+	// //3 calls to karatsuba
+	// z0 = fastMulArray(low1, low2);
+	// z1 = karatsuba(low1.addArray(high1), low2.addArray(high2));
+	// z2 = karatsuba(xdiv, ydiv);
+	// return z2.mul(Base.pow(m2.mulDigit(2))) + ((z1.sub(z2).sub(z0)).mul(Base.pow(m2))) + z0;
 }
 
 // this = this * x
@@ -322,6 +336,41 @@ void PosInt::mul(const PosInt& x) {
 // this = this * x, using Karatsuba's method
 void PosInt::fastMul(const PosInt& x) {
 
+	// make copy if multiplying this with self
+	if(this == &x) {
+		PosInt xcopy(x);
+		fastMul(xcopy);
+		return;
+	}
+
+	// if this has no digits
+	int mylen = digits.size();
+	int xlen = x.digits.size();
+	if(mylen == 0 || xlen == 0) {
+		set(0);
+		return;
+	}
+
+	//create zero-padded input arrays
+	//least significant digits will be on the left
+	int inputlen = max(mylen, xlen);
+	int *mycopy = new int[inputlen]();
+	int *xcopy = new int[inputlen]();
+
+	//fill input arrays with digits
+  	for (int i=0; i<mylen; ++i) mycopy[i] = digits[i];
+	for (int i=0; i<xlen; ++i) xcopy[i] = x.digits[i];  	
+
+  	//prepare digits for result
+  	digits.clear();
+  	digits.resize(mylen + xlen);
+
+  	//call my fastMulArray function
+  	fastMulArray(&digits[0], mycopy, xcopy, inputlen);
+
+  	normalize();
+  	delete [] mycopy;
+  	delete [] xcopy;
 }
 
 /******************** DIVISION ********************/
