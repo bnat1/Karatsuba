@@ -10,6 +10,7 @@ using namespace std;
 int PosInt::B = 0x8000;
 int PosInt::Bbase = 2;
 int PosInt::Bpow = 15;
+bool debug = true;
 
 void PosInt::setBase(int base, int pow) {
   Bbase = base;
@@ -287,26 +288,129 @@ void PosInt::mulArray
     }
   }
 }
+void debugArray(const int *x, int len){
+	for(int i = 0; i < len; i ++){
+		cout << x[i] << " ";
+	}
+	cout << endl;
+}
 
 // Computes dest = x * y, digit-wise, using Karatsuba's method.
 // x and y have the same length (len)
 // dest must have size (2*len) to store the result.
 void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
+	if(debug){
+		cout << "fastMulArray called" << endl;
+		cout << "len: " << len << endl;
+		cout << "input x: ";
+		debugArray(x, len);
+		cout << "input y: ";
+		debugArray(y, len);
+	}
 
-	// if(x < B || y < B){
-	// 	dest[0] = x.mul(y)
-	// } 
+	//base case: length == 1: multiply, return
+	if(len == 1){
+		mulArray(dest, x, len, y, len);
+		return;
+	}
 
-	// int lenOver2 = len / 2;
+	int lenOver2 = len / 2;
+	int twoLenOver2 = 2 * lenOver2;
+	
+	// create subarrays of inputs to work with
+	int *xHigh = new int[lenOver2]();
+	int *xLow = new int[lenOver2]();
+	int *yHigh = new int[lenOver2]();
+	int *yLow = new int[lenOver2]();
 
-	// // split up inputs into subarrays
-	// int *low1, *low2, *high1, *high2, *z0, *z1, *z2;
+	//used in fastMulArray call
+	int *temp1 = new int[lenOver2](); // is this the right length?
+	int *temp2 = new int[lenOver2]();
 
-	// //3 calls to karatsuba
-	// z0 = fastMulArray(low1, low2);
-	// z1 = karatsuba(low1.addArray(high1), low2.addArray(high2));
-	// z2 = karatsuba(xdiv, ydiv);
-	// return z2.mul(Base.pow(m2.mulDigit(2))) + ((z1.sub(z2).sub(z0)).mul(Base.pow(m2))) + z0;
+	//shift right inputs right
+	for(int i = 0; i < lenOver2; ++i){ 
+		xLow[i] = x[i];
+		yLow[i] = y[i];
+		temp1[i] = x[i];
+		temp2[i] = y[i];
+	}
+
+	//shift inputs left
+	for(int i = lenOver2; i < len; ++i){
+		xHigh[i] = x[i];
+		yHigh[i] = y[i];
+	}
+	if(debug){
+		cout << "xlow: ";
+		debugArray(xLow, lenOver2);
+		cout << "xhigh: ";
+		debugArray(xHigh, lenOver2);
+		cout << "ylow: ";
+		debugArray(yLow, lenOver2);
+		cout << "yhigh: ";
+		debugArray(yHigh, lenOver2);
+	}
+	// z's beome the dests of the base case
+	int *z0 = new int[len]();
+	int *z1 = new int[len](); // is length a problem?
+	int *z2 = new int[len]();
+
+	// setup before calling fastMulArray
+	addArray(temp1, xHigh, lenOver2);
+	addArray(temp2, yHigh, lenOver2);
+
+	if(debug){
+		cout << "temp1: ";
+		debugArray(temp1, len);
+		cout << "temp1: ";
+		debugArray(temp2, len);
+	}
+	// 3 calls to karatsuba
+	fastMulArray(z0, xLow, yLow, lenOver2);
+	if(debug){
+		cout << "z0 = xLow * yLow: ";
+		debugArray(z0, lenOver2);
+	}
+	delete [] xLow;	delete [] yLow;	
+	fastMulArray(z1, temp1, temp2, lenOver2);
+	if(debug){	
+		cout << "z1 = temp1 * temp2: ";
+		debugArray(z1, lenOver2);
+	}
+	delete [] temp1; delete [] temp2;
+	fastMulArray(z2, xHigh, yHigh, lenOver2);
+	if(debug){
+		cout << "z2 = xHigh * yHigh: ";
+		debugArray(z2, lenOver2);	
+	}
+	delete [] xHigh; delete [] yHigh;
+
+	// shift z2 for later use
+	int *z2Shifted = new int[len + twoLenOver2]();
+	for(int i = 0; i < len; i++){
+		z2Shifted[i + twoLenOver2] = z2[i];
+	}
+
+	// z1 - z2 - z0
+	int *z1_z2_z0 = new int[len]();
+	addArray(z1_z2_z0, z1, len);
+	subArray(z1_z2_z0, z2, len);
+	subArray(z1_z2_z0, z0, len);
+
+	// shift (z1-z2-z0)
+	int *z1_z2_z0Shifted = new int[len + lenOver2]();
+	for(int i = 0; i < len; i++){
+		z1_z2_z0Shifted[i + twoLenOver2] = z1_z2_z0[i];
+	}
+	//  set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
+	//	same as(z2 with 2*m2 zeros to the left) + ((z1 - z2 - z0) with m2 zeros to the left) + z0
+	addArray(dest, z2Shifted, len);
+	addArray(dest, z1_z2_z0Shifted, len);
+	addArray(dest, z0, len);
+	delete [] z0; delete [] z1; delete [] z2;
+	delete [] z1_z2_z0; delete [] z2Shifted; delete [] z1_z2_z0Shifted;
+
+	return;
 }
 
 // this = this * x
@@ -343,7 +447,7 @@ void PosInt::fastMul(const PosInt& x) {
 		return;
 	}
 
-	// if this has no digits
+	// if an input has no digits
 	int mylen = digits.size();
 	int xlen = x.digits.size();
 	if(mylen == 0 || xlen == 0) {
@@ -561,4 +665,3 @@ void PosInt::xgcd (PosInt& s, PosInt& t, const PosInt& x, const PosInt& y) {
 bool PosInt::MillerRabin () const {
   return false;
 }
-
