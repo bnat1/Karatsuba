@@ -19,7 +19,7 @@ int main() {
 
   // x = 2^128
   PosInt x(64);
-  PosInt y(64);
+  PosInt y(16);
   x.fastMul(y);
   x.print(cout);
   // x.pow(y);
