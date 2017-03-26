@@ -308,12 +308,28 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 		debugArray(y, len);
 	}
 
-	//base case: length == 1: multiply, return
-	if(len == 1){
-		mulArray(dest, x, len, y, len);
-		return;
+	//check for base case: an input is only one digit or zero
+	bool baseCaseX = true;
+	bool baseCaseY = true;
+	for(int i = 1; i < len; ++i){
+		if(x[i] != 0) {
+			baseCaseX = false;
+		}
+		if(y[i] != 0) {
+			baseCaseY = false;
+		}
 	}
-
+	// multiply, return
+	if(baseCaseX || baseCaseY){
+		if(debug){
+			cout << "basecae achieved" << endl;
+		}
+		mulArray(dest, x, len, y, len);
+		return;	
+	}
+	if(debug){
+		cout << "basecase missed" << endl;
+	}
 	int lenOver2 = len / 2;
 	int twoLenOver2 = 2 * lenOver2;
 	

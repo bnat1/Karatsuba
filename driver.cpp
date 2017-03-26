@@ -18,8 +18,8 @@ int main() {
   // PosInt::setBase(10, 4);
 
   // x = 2^128
-  PosInt x(9);
-  PosInt y(10);
+  PosInt x(64);
+  PosInt y(64);
   x.fastMul(y);
   x.print(cout);
   // x.pow(y);
