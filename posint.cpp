@@ -10,7 +10,7 @@ using namespace std;
 int PosInt::B = 0x8000;
 int PosInt::Bbase = 2;
 int PosInt::Bpow = 15;
-bool debug = false;
+bool debug = true;
 
 void PosInt::setBase(int base, int pow) {
   Bbase = base;
@@ -315,7 +315,6 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 		mulArray(dest, x, len, y, len);	
 		return;	
 	}
-
 				if(debug){
 					cout << "basecase missed" << endl;
 				}
@@ -329,29 +328,33 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 	int twoLen = 2 * len;
 
 	// create subarrays of inputs to work with
-	int *xHigh = new int[subarrayLen]();
-	int *xLow = new int[subarrayLen]();
-	int *yHigh = new int[subarrayLen]();
-	int *yLow = new int[subarrayLen]();
+	const int *xHigh = x + lenOver2;
+	const int *yHigh = y + lenOver2;
+	int *xLow = new int[subarrayLen];
+	int *yLow = new int[subarrayLen];
 
 	//used in fastMulArray call
-	int lPlushLen = subarrayLen + 1;
-	int *xlPlusxh = new int[lPlushLen](); //length?
-	int *ylPlusyh = new int[lPlushLen]();
+	int lPlusHLen = subarrayLen + 1;
+	int *xlPlusxh = new int[lPlusHLen](); //length?
+	int *ylPlusyh = new int[lPlusHLen]();
 
-	//shift inputs right
+	//left subarray (smaller and zero-padded if odd)
+	xLow[subarrayLen - 1] = 0;
+	yLow[subarrayLen - 1] = 0;
 	for(int i = 0; i < lenOver2; ++i){ 
 		xLow[i] = x[i];
 		yLow[i] = y[i];
+		//these start with same values as xLow and yLow
 		xlPlusxh[i] = x[i];
 		ylPlusyh[i] = y[i];
 	}
 
-	//shift inputs left
-	for(int i = lenOver2; i < len; ++i){
-		xHigh[i-lenOver2] = x[i];
-		yHigh[i-lenOver2] = y[i];
-	}
+	//optimized, now xHigh and yHigh just point to x and y
+	//right subarray
+	// for(int i = lenOver2; i < len; ++i){
+	// 	xHigh[i-lenOver2] = x[i];
+	// 	yHigh[i-lenOver2] = y[i];
+	// }
 				if(debug){
 					cout << "xlow: ";
 					debugArray(xLow, subarrayLen);
@@ -362,20 +365,20 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 					cout << "yhigh: ";
 					debugArray(yHigh, subarrayLen);
 				}
-	// z's beome the dests of the base case
+	// z's will beome the dests of the base case
 	int *z0 = new int[zLen]();
-	int *z1 = new int[zLen](); // is length a problem?
-	int *z2 = new int[zLen]();
+	int *z1 = new int[zLen]();
+	int *z2Shifted = new int[zLen + twoLenOver2]();
+	int *z2 = z2Shifted + twoLenOver2;
 
-
-	// setup before calling fastMulArray
+	// add xLow to yLow and yLow to yHigh
 	addArray(xlPlusxh, xHigh, subarrayLen);
 	addArray(ylPlusyh, yHigh, subarrayLen);
 
-	//normalize xlPlusxh, ylPlusyh
+	//'normalize' xlPlusxh, ylPlusyh
 	while(true){
-		if(xlPlusxh[lPlushLen - 1] != 0 || ylPlusyh[lPlushLen - 1] != 0){break;}
-		--lPlushLen;
+		if(xlPlusxh[lPlusHLen - 1] != 0 || ylPlusyh[lPlusHLen - 1] != 0){break;}
+		--lPlusHLen;
 	}
 
 				if(debug){
@@ -398,7 +401,7 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 				if(debug){
 					cout << "calling fastMulArray with xlPlusxh, ylPlusyh" << endl;
 				}	
-	fastMulArray(z1, xlPlusxh, ylPlusyh, lPlushLen);
+	fastMulArray(z1, xlPlusxh, ylPlusyh, lPlusHLen);
 	delete [] xlPlusxh; delete [] ylPlusyh;
 				if(debug){	
 					cout << "z1 = xlPlusxh * ylPlusyh: ";
@@ -409,23 +412,24 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 					cout << "calling fastMulArray with xhigh, yhigh" << endl;
 				}	
 	fastMulArray(z2, xHigh, yHigh, subarrayLen);
-	delete [] xHigh; delete [] yHigh;
+	xHigh = NULL; yHigh = NULL;
 				if(debug){
 					cout << "z2 = xHigh * yHigh: ";
 					debugArray(z2, zLen);	
 				}
 
+	// optimized
 	// shift z2 for later use
-	int *z2Shifted = new int[zLen + twoLenOver2]();
-	for(int i = 0; i < zLen; i++){
-		z2Shifted[i + twoLenOver2] = z2[i];
-	}
+	// for(int i = 0; i < zLen; i++){
+	// 	z2Shifted[i + twoLenOver2] = z2[i];
+	// }
 				if(debug){
 					cout << "z2 shifted: ";
 					debugArray(z2Shifted, zLen + twoLenOver2);
 				}
 	// z1 - z2 - z0
-	int *z1_z2_z0 = new int[zLen]();
+	int *z1_z2_z0Shifted = new int[zLen + lenOver2]();
+	int *z1_z2_z0 = z1_z2_z0Shifted + lenOver2;
 	addArray(z1_z2_z0, z1, zLen);
 	subArray(z1_z2_z0, z2, zLen);
 	subArray(z1_z2_z0, z0, zLen);
@@ -433,11 +437,11 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 					cout << "z1 - z2 - z0: ";
 					debugArray(z1_z2_z0, zLen);
 				}
+	//optimized
 	// shift (z1-z2-z0)
-	int *z1_z2_z0Shifted = new int[zLen + lenOver2]();
-	for(int i = 0; i < zLen; i++){
-		z1_z2_z0Shifted[i + lenOver2] = z1_z2_z0[i];
-	}	
+	// for(int i = 0; i < zLen; i++){
+	// 	z1_z2_z0Shifted[i + lenOver2] = z1_z2_z0[i];
+	// }	
 				if(debug){
 					cout << "z1 - z2 - z0 shifted: ";
 					debugArray(z1_z2_z0Shifted, zLen + lenOver2);
@@ -461,8 +465,8 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 					debugArray(dest, twoLen);
 				}	
 
-	delete [] z0; delete [] z1; delete [] z2;
-	delete [] z1_z2_z0; delete [] z2Shifted; delete [] z1_z2_z0Shifted;
+	delete [] z0; delete [] z1; z2 = NULL; delete [] z2Shifted; 
+	delete [] z1_z2_z0Shifted; z1_z2_z0 = NULL; 
 
 	return;
 }
