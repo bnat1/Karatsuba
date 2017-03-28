@@ -17,11 +17,21 @@ int main() {
   
   // PosInt::setBase(10, 4);
 
+  //64 * 16
+  // PosInt test1a(64);
+  // PosInt test1b(16);
+  // test1a.fastMul(test1b);
+  // test1a.print(cout);
+  
+  //2148 ^ 2
+  PosInt test2a(999);
+  PosInt test2b(99);
+  test2a.fastMul(test2b);
+  test2a.print(cout);
+
+
+
   // x = 2^128
-  PosInt x(64);
-  PosInt y(16);
-  x.fastMul(y);
-  x.print(cout);
   // x.pow(y);
 
   // z = random number between 0 and 2^128 - 1
