@@ -10,7 +10,7 @@ using namespace std;
 int PosInt::B = 0x8000;
 int PosInt::Bbase = 2;
 int PosInt::Bpow = 15;
-bool debug = true;
+bool debug = false;
 
 void PosInt::setBase(int base, int pow) {
   Bbase = base;
@@ -316,25 +316,25 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 		return;	
 	}
 
-	//check for base case: an input is only one digit or zero
-	bool baseCase = true;
-	for(int i = 1; i < len; ++i){
-		if(x[i] != 0 || y[i] != 0) {
-			baseCase = false;
-			break;
-		}
-	}
-	// multiply, return
-	if(baseCase){
-		if(debug){
-			cout << "basecase achieved" << endl;
-		}
-		mulArray(dest, x, len, y, len);
-		return;	
-	}
+	// //check for base case: an input is only one digit or zero
+	// bool baseCase = true;
+	// for(int i = 1; i < len; ++i){
+	// 	if(x[i] != 0 || y[i] != 0) {
+	// 		baseCase = false;
+	// 		break;
+	// 	}
+	// }
+	// // multiply, return
+	// if(baseCase){
+	// 	if(debug){
+	// 		cout << "basecase achieved" << endl;
+	// 	}
+	// 	mulArray(dest, x, len, y, len);
+	// 	return;	
+	// }
 
-	// check for base case: lenght 1
-	// old basecase
+	// // check for base case: lenght 1
+	// // old basecase
 
 	if(debug){
 		cout << "basecase missed" << endl;
@@ -355,15 +355,16 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 	int *yLow = new int[subarrayLen]();
 
 	//used in fastMulArray call
-	int *temp1 = new int[subarrayLen + 1](); //length?
-	int *temp2 = new int[subarrayLen + 1]();
+	int lPlushLen = subarrayLen + 1;
+	int *xlPlusxh = new int[lPlushLen](); //length?
+	int *ylPlusyh = new int[lPlushLen]();
 
 	//shift inputs right
 	for(int i = 0; i < lenOver2; ++i){ 
 		xLow[i] = x[i];
 		yLow[i] = y[i];
-		temp1[i] = x[i];
-		temp2[i] = y[i];
+		xlPlusxh[i] = x[i];
+		ylPlusyh[i] = y[i];
 	}
 
 	//shift inputs left
@@ -386,21 +387,28 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 	int *z1 = new int[zLen](); // is length a problem?
 	int *z2 = new int[zLen]();
 
+
 	// setup before calling fastMulArray
-	addArray(temp1, xHigh, subarrayLen);
-	addArray(temp2, yHigh, subarrayLen);
+	addArray(xlPlusxh, xHigh, subarrayLen);
+	addArray(ylPlusyh, yHigh, subarrayLen);
+
+	//normalize xlPlusxh, ylPlusyh
+	while(true){
+		if(xlPlusxh[lPlushLen - 1] != 0 || ylPlusyh[lPlushLen - 1] != 0){break;}
+		--lPlushLen;
+	}
 
 	if(debug){
-		cout << "temp1 = xLow + xHigh: ";
-		debugArray(temp1, subarrayLen + 1);
-		cout << "temp2 = yLow + yHigh: ";
-		debugArray(temp2, subarrayLen + 1);
+		cout << "xlPlusxh = xLow + xHigh: ";
+		debugArray(xlPlusxh, subarrayLen + 1);
+		cout << "ylPlusyh = yLow + yHigh: ";
+		debugArray(ylPlusyh, subarrayLen + 1);
 	}
 	// 3 calls to karatsuba
 	if(debug){
 		cout << "calling fastMulArray with xLow, yLow" << endl;
 	}	
-	fastMulArray(z0, xLow, yLow, subarrayLen);
+	fastMulArray(z0, xLow, yLow, lenOver2);
 	delete [] xLow;	delete [] yLow;	
 	if(debug){
 		cout << "z0 = xLow * yLow: ";
@@ -408,12 +416,12 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 	}
 
 	if(debug){
-		cout << "calling fastMulArray with temp1, temp2" << endl;
+		cout << "calling fastMulArray with xlPlusxh, ylPlusyh" << endl;
 	}	
-	fastMulArray(z1, temp1, temp2, subarrayLen + 1);
-	delete [] temp1; delete [] temp2;
+	fastMulArray(z1, xlPlusxh, ylPlusyh, lPlushLen);
+	delete [] xlPlusxh; delete [] ylPlusyh;
 	if(debug){	
-		cout << "z1 = temp1 * temp2: ";
+		cout << "z1 = xlPlusxh * ylPlusyh: ";
 		debugArray(z1, zLen);
 	}
 

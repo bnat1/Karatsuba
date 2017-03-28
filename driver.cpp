@@ -25,7 +25,7 @@ int main() {
   
   //2148 ^ 2
   PosInt test2a(999);
-  PosInt test2b(99);
+  PosInt test2b(99345);
   test2a.fastMul(test2b);
   test2a.print(cout);
 
