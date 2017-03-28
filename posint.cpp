@@ -299,174 +299,147 @@ void debugArray(const int *x, int len){
 // x and y have the same length (len)
 // dest must have size (2*len) to store the result.
 void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
-				if(debug){
-					cout << "fastMulArray called" << endl;
-					cout << "len: " << len << endl;
-					cout << "input x: ";
-					debugArray(x, len);
-					cout << "input y: ";
-					debugArray(y, len);
-				}
-
+				// if(debug){
+				// 	cout << "fastMulArray called" << endl;
+				// 	cout << "len: " << len << endl;
+				// 	cout << "input x: ";
+				// 	debugArray(x, len);
+				// 	cout << "input y: ";
+				// 	debugArray(y, len);
+				// }
 	if(len == 1) {
-					if(debug){
-						cout << "basecase achieved" << endl;
-					}
+					// if(debug){
+					// 	cout << "basecase achieved" << endl;
+					// }
 		mulArray(dest, x, len, y, len);	
 		return;	
 	}
-				if(debug){
-					cout << "basecase missed" << endl;
-				}
+				// if(debug){
+				// 	cout << "basecase missed" << endl;
+				// }
 	int lenOver2 = len / 2;
 	int twoLenOver2 = 2 * lenOver2;
-
 	//length of subarrays, determined by odd or even
 	int subarrayLen = lenOver2 + len % 2;
-
 	int zLen = 2*(subarrayLen + 1);
 	int twoLen = 2 * len;
-
 	// create subarrays of inputs to work with
 	const int *xHigh = x + lenOver2;
 	const int *yHigh = y + lenOver2;
 	int *xLow = new int[subarrayLen];
 	int *yLow = new int[subarrayLen];
-
 	//used in fastMulArray call
 	int lPlusHLen = subarrayLen + 1;
-	int *xlPlusxh = new int[lPlusHLen](); //length?
+	int *xlPlusxh = new int[lPlusHLen]();
 	int *ylPlusyh = new int[lPlusHLen]();
-
 	//left subarray (smaller and zero-padded if odd)
 	xLow[subarrayLen - 1] = 0;
 	yLow[subarrayLen - 1] = 0;
 	for(int i = 0; i < lenOver2; ++i){ 
-		xLow[i] = x[i];
-		yLow[i] = y[i];
+		xLow[i] = xlPlusxh[i] = x[i];
+		yLow[i] = ylPlusyh[i] = y[i];
 		//these start with same values as xLow and yLow
-		xlPlusxh[i] = x[i];
-		ylPlusyh[i] = y[i];
 	}
-
-	//optimized, now xHigh and yHigh just point to x and y
-	//right subarray
-	// for(int i = lenOver2; i < len; ++i){
-	// 	xHigh[i-lenOver2] = x[i];
-	// 	yHigh[i-lenOver2] = y[i];
-	// }
-				if(debug){
-					cout << "xlow: ";
-					debugArray(xLow, subarrayLen);
-					cout << "xhigh: ";
-					debugArray(xHigh, subarrayLen);
-					cout << "ylow: ";
-					debugArray(yLow, subarrayLen);
-					cout << "yhigh: ";
-					debugArray(yHigh, subarrayLen);
-				}
+				// if(debug){
+				// 	cout << "xlow: ";
+				// 	debugArray(xLow, subarrayLen);
+				// 	cout << "xhigh: ";
+				// 	debugArray(xHigh, subarrayLen);
+				// 	cout << "ylow: ";
+				// 	debugArray(yLow, subarrayLen);
+				// 	cout << "yhigh: ";
+				// 	debugArray(yHigh, subarrayLen);
+				// }
 	// z's will beome the dests of the base case
 	int *z0 = new int[zLen]();
-	int *z1 = new int[zLen]();
+	int *z1_z2_z0Shifted = new int[zLen + lenOver2]();
+	int *z1 = z1_z2_z0Shifted + lenOver2;
 	int *z2Shifted = new int[zLen + twoLenOver2]();
 	int *z2 = z2Shifted + twoLenOver2;
-
 	// add xLow to yLow and yLow to yHigh
 	addArray(xlPlusxh, xHigh, subarrayLen);
 	addArray(ylPlusyh, yHigh, subarrayLen);
-
 	//'normalize' xlPlusxh, ylPlusyh
 	while(true){
 		if(xlPlusxh[lPlusHLen - 1] != 0 || ylPlusyh[lPlusHLen - 1] != 0){break;}
 		--lPlusHLen;
 	}
-
-				if(debug){
-					cout << "xlPlusxh = xLow + xHigh: ";
-					debugArray(xlPlusxh, subarrayLen + 1);
-					cout << "ylPlusyh = yLow + yHigh: ";
-					debugArray(ylPlusyh, subarrayLen + 1);
-				}
+				// if(debug){
+				// 	cout << "xlPlusxh = xLow + xHigh: ";
+				// 	debugArray(xlPlusxh, subarrayLen + 1);
+				// 	cout << "ylPlusyh = yLow + yHigh: ";
+				// 	debugArray(ylPlusyh, subarrayLen + 1);
+				// }
 	// 3 calls to karatsuba
-				if(debug){
-					cout << "calling fastMulArray with xLow, yLow" << endl;
-				}	
+				// if(debug){
+				// 	cout << "calling fastMulArray with xLow, yLow" << endl;
+				// }	
 	fastMulArray(z0, xLow, yLow, lenOver2);
-	delete [] xLow;	delete [] yLow;	
-				if(debug){
-					cout << "z0 = xLow * yLow: ";
-					debugArray(z0, zLen);
-				}
+	delete [] xLow;	
+	delete [] yLow;	
+				// if(debug){
+				// 	cout << "z0 = xLow * yLow: ";
+				// 	debugArray(z0, zLen);
+				// }
 
-				if(debug){
-					cout << "calling fastMulArray with xlPlusxh, ylPlusyh" << endl;
-				}	
+				// if(debug){
+				// 	cout << "calling fastMulArray with xlPlusxh, ylPlusyh" << endl;
+				// }	
 	fastMulArray(z1, xlPlusxh, ylPlusyh, lPlusHLen);
-	delete [] xlPlusxh; delete [] ylPlusyh;
-				if(debug){	
-					cout << "z1 = xlPlusxh * ylPlusyh: ";
-					debugArray(z1, zLen);
-				}
+	delete [] xlPlusxh; 
+	delete [] ylPlusyh;
+				// if(debug){	
+				// 	cout << "z1 = xlPlusxh * ylPlusyh: ";
+				// 	debugArray(z1, zLen);
+				// }
 
-				if(debug){
-					cout << "calling fastMulArray with xhigh, yhigh" << endl;
-				}	
+				// if(debug){
+				// 	cout << "calling fastMulArray with xhigh, yhigh" << endl;
+				// }	
 	fastMulArray(z2, xHigh, yHigh, subarrayLen);
-	xHigh = NULL; yHigh = NULL;
-				if(debug){
-					cout << "z2 = xHigh * yHigh: ";
-					debugArray(z2, zLen);	
-				}
-
-	// optimized
-	// shift z2 for later use
-	// for(int i = 0; i < zLen; i++){
-	// 	z2Shifted[i + twoLenOver2] = z2[i];
-	// }
-				if(debug){
-					cout << "z2 shifted: ";
-					debugArray(z2Shifted, zLen + twoLenOver2);
-				}
+	xHigh = NULL; 
+	yHigh = NULL;
+				// if(debug){
+				// 	cout << "z2 = xHigh * yHigh: ";
+				// 	debugArray(z2, zLen);	
+				// }
+				// if(debug){
+				// 	cout << "z2 shifted: ";
+				// 	debugArray(z2Shifted, zLen + twoLenOver2);
+				// }
 	// z1 - z2 - z0
-	int *z1_z2_z0Shifted = new int[zLen + lenOver2]();
-	int *z1_z2_z0 = z1_z2_z0Shifted + lenOver2;
-	addArray(z1_z2_z0, z1, zLen);
-	subArray(z1_z2_z0, z2, zLen);
-	subArray(z1_z2_z0, z0, zLen);
-				if(debug){
-					cout << "z1 - z2 - z0: ";
-					debugArray(z1_z2_z0, zLen);
-				}
-	//optimized
-	// shift (z1-z2-z0)
-	// for(int i = 0; i < zLen; i++){
-	// 	z1_z2_z0Shifted[i + lenOver2] = z1_z2_z0[i];
-	// }	
-				if(debug){
-					cout << "z1 - z2 - z0 shifted: ";
-					debugArray(z1_z2_z0Shifted, zLen + lenOver2);
-				}
+	subArray(z1, z2, zLen);
+	subArray(z1, z0, zLen);
+				// if(debug){
+				// 	cout << "z1 - z2 - z0: ";
+				// 	debugArray(z1, zLen);
+				// 	cout << "z1 - z2 - z0 shifted: ";
+				// 	debugArray(z1_z2_z0Shifted, zLen + lenOver2);
+				// }
 
 	//  set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
 	//	same as(z2 with 2*m2 zeros to the left) + ((z1 - z2 - z0) with m2 zeros to the left) + z0
 	addArray(dest, z2Shifted, twoLen);
-				if(debug){
-					cout << "added z2shifted to dest: ";
-					debugArray(dest, twoLen);
-				}	
+				// if(debug){
+				// 	cout << "added z2shifted to dest: ";
+				// 	debugArray(dest, twoLen);
+				// }	
 	addArray(dest, z1_z2_z0Shifted, twoLen);
-				if(debug){
-					cout << "added z1_z2_z3 to dest: ";
-					debugArray(dest, twoLen);
-				}	
+				// if(debug){
+				// 	cout << "added z1_z2_z3 to dest: ";
+				// 	debugArray(dest, twoLen);
+				// }	
 	addArray(dest, z0, twoLen);
-				if(debug){
-					cout << "added z0 to dest: ";
-					debugArray(dest, twoLen);
-				}	
+				// if(debug){
+				// 	cout << "added z0 to dest: ";
+				// 	debugArray(dest, twoLen);
+				// }	
 
-	delete [] z0; delete [] z1; z2 = NULL; delete [] z2Shifted; 
-	delete [] z1_z2_z0Shifted; z1_z2_z0 = NULL; 
+	z1 = NULL; 
+	z2 = NULL; 
+	delete [] z2Shifted; 
+	delete [] z1_z2_z0Shifted;
+	delete [] z0; 
 
 	return;
 }
