@@ -299,46 +299,26 @@ void debugArray(const int *x, int len){
 // x and y have the same length (len)
 // dest must have size (2*len) to store the result.
 void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
-	if(debug){
-		cout << "fastMulArray called" << endl;
-		cout << "len: " << len << endl;
-		cout << "input x: ";
-		debugArray(x, len);
-		cout << "input y: ";
-		debugArray(y, len);
-	}
+				if(debug){
+					cout << "fastMulArray called" << endl;
+					cout << "len: " << len << endl;
+					cout << "input x: ";
+					debugArray(x, len);
+					cout << "input y: ";
+					debugArray(y, len);
+				}
 
 	if(len == 1) {
-		if(debug){
-			cout << "basecase achieved" << endl;
-		}
+					if(debug){
+						cout << "basecase achieved" << endl;
+					}
 		mulArray(dest, x, len, y, len);	
 		return;	
 	}
 
-	// //check for base case: an input is only one digit or zero
-	// bool baseCase = true;
-	// for(int i = 1; i < len; ++i){
-	// 	if(x[i] != 0 || y[i] != 0) {
-	// 		baseCase = false;
-	// 		break;
-	// 	}
-	// }
-	// // multiply, return
-	// if(baseCase){
-	// 	if(debug){
-	// 		cout << "basecase achieved" << endl;
-	// 	}
-	// 	mulArray(dest, x, len, y, len);
-	// 	return;	
-	// }
-
-	// // check for base case: lenght 1
-	// // old basecase
-
-	if(debug){
-		cout << "basecase missed" << endl;
-	}
+				if(debug){
+					cout << "basecase missed" << endl;
+				}
 	int lenOver2 = len / 2;
 	int twoLenOver2 = 2 * lenOver2;
 
@@ -372,16 +352,16 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 		xHigh[i-lenOver2] = x[i];
 		yHigh[i-lenOver2] = y[i];
 	}
-	if(debug){
-		cout << "xlow: ";
-		debugArray(xLow, subarrayLen);
-		cout << "xhigh: ";
-		debugArray(xHigh, subarrayLen);
-		cout << "ylow: ";
-		debugArray(yLow, subarrayLen);
-		cout << "yhigh: ";
-		debugArray(yHigh, subarrayLen);
-	}
+				if(debug){
+					cout << "xlow: ";
+					debugArray(xLow, subarrayLen);
+					cout << "xhigh: ";
+					debugArray(xHigh, subarrayLen);
+					cout << "ylow: ";
+					debugArray(yLow, subarrayLen);
+					cout << "yhigh: ";
+					debugArray(yHigh, subarrayLen);
+				}
 	// z's beome the dests of the base case
 	int *z0 = new int[zLen]();
 	int *z1 = new int[zLen](); // is length a problem?
@@ -398,88 +378,88 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 		--lPlushLen;
 	}
 
-	if(debug){
-		cout << "xlPlusxh = xLow + xHigh: ";
-		debugArray(xlPlusxh, subarrayLen + 1);
-		cout << "ylPlusyh = yLow + yHigh: ";
-		debugArray(ylPlusyh, subarrayLen + 1);
-	}
+				if(debug){
+					cout << "xlPlusxh = xLow + xHigh: ";
+					debugArray(xlPlusxh, subarrayLen + 1);
+					cout << "ylPlusyh = yLow + yHigh: ";
+					debugArray(ylPlusyh, subarrayLen + 1);
+				}
 	// 3 calls to karatsuba
-	if(debug){
-		cout << "calling fastMulArray with xLow, yLow" << endl;
-	}	
+				if(debug){
+					cout << "calling fastMulArray with xLow, yLow" << endl;
+				}	
 	fastMulArray(z0, xLow, yLow, lenOver2);
 	delete [] xLow;	delete [] yLow;	
-	if(debug){
-		cout << "z0 = xLow * yLow: ";
-		debugArray(z0, zLen);
-	}
+				if(debug){
+					cout << "z0 = xLow * yLow: ";
+					debugArray(z0, zLen);
+				}
 
-	if(debug){
-		cout << "calling fastMulArray with xlPlusxh, ylPlusyh" << endl;
-	}	
+				if(debug){
+					cout << "calling fastMulArray with xlPlusxh, ylPlusyh" << endl;
+				}	
 	fastMulArray(z1, xlPlusxh, ylPlusyh, lPlushLen);
 	delete [] xlPlusxh; delete [] ylPlusyh;
-	if(debug){	
-		cout << "z1 = xlPlusxh * ylPlusyh: ";
-		debugArray(z1, zLen);
-	}
+				if(debug){	
+					cout << "z1 = xlPlusxh * ylPlusyh: ";
+					debugArray(z1, zLen);
+				}
 
-	if(debug){
-		cout << "calling fastMulArray with xhigh, yhigh" << endl;
-	}	
+				if(debug){
+					cout << "calling fastMulArray with xhigh, yhigh" << endl;
+				}	
 	fastMulArray(z2, xHigh, yHigh, subarrayLen);
 	delete [] xHigh; delete [] yHigh;
-	if(debug){
-		cout << "z2 = xHigh * yHigh: ";
-		debugArray(z2, zLen);	
-	}
+				if(debug){
+					cout << "z2 = xHigh * yHigh: ";
+					debugArray(z2, zLen);	
+				}
 
 	// shift z2 for later use
 	int *z2Shifted = new int[zLen + twoLenOver2]();
 	for(int i = 0; i < zLen; i++){
 		z2Shifted[i + twoLenOver2] = z2[i];
 	}
-	if(debug){
-		cout << "z2 shifted: ";
-		debugArray(z2Shifted, zLen + twoLenOver2);
-	}
+				if(debug){
+					cout << "z2 shifted: ";
+					debugArray(z2Shifted, zLen + twoLenOver2);
+				}
 	// z1 - z2 - z0
 	int *z1_z2_z0 = new int[zLen]();
 	addArray(z1_z2_z0, z1, zLen);
 	subArray(z1_z2_z0, z2, zLen);
 	subArray(z1_z2_z0, z0, zLen);
-	if(debug){
-		cout << "z1 - z2 - z0: ";
-		debugArray(z1_z2_z0, zLen);
-	}
+				if(debug){
+					cout << "z1 - z2 - z0: ";
+					debugArray(z1_z2_z0, zLen);
+				}
 	// shift (z1-z2-z0)
 	int *z1_z2_z0Shifted = new int[zLen + lenOver2]();
 	for(int i = 0; i < zLen; i++){
 		z1_z2_z0Shifted[i + lenOver2] = z1_z2_z0[i];
 	}	
-	if(debug){
-		cout << "z1 - z2 - z0 shifted: ";
-		debugArray(z1_z2_z0Shifted, zLen + lenOver2);
-	}
+				if(debug){
+					cout << "z1 - z2 - z0 shifted: ";
+					debugArray(z1_z2_z0Shifted, zLen + lenOver2);
+				}
 
 	//  set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
 	//	same as(z2 with 2*m2 zeros to the left) + ((z1 - z2 - z0) with m2 zeros to the left) + z0
 	addArray(dest, z2Shifted, twoLen);
-	if(debug){
-		cout << "added z2shifted to dest: ";
-		debugArray(dest, twoLen);
-	}	
+				if(debug){
+					cout << "added z2shifted to dest: ";
+					debugArray(dest, twoLen);
+				}	
 	addArray(dest, z1_z2_z0Shifted, twoLen);
-	if(debug){
-		cout << "added z1_z2_z3 to dest: ";
-		debugArray(dest, twoLen);
-	}	
+				if(debug){
+					cout << "added z1_z2_z3 to dest: ";
+					debugArray(dest, twoLen);
+				}	
 	addArray(dest, z0, twoLen);
-	if(debug){
-		cout << "added z0 to dest: ";
-		debugArray(dest, twoLen);
-	}	
+				if(debug){
+					cout << "added z0 to dest: ";
+					debugArray(dest, twoLen);
+				}	
 
 	delete [] z0; delete [] z1; delete [] z2;
 	delete [] z1_z2_z0; delete [] z2Shifted; delete [] z1_z2_z0Shifted;
@@ -541,7 +521,7 @@ void PosInt::fastMul(const PosInt& x) {
 
   	//prepare digits for result
   	digits.clear();
-  	digits.resize(inputlen*2);
+  	digits.resize(mylen + xlen);
 
   	//call my fastMulArray function
   	fastMulArray(&digits[0], mycopy, xcopy, inputlen);
