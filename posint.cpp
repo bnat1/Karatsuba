@@ -317,14 +317,14 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 	const int *yLow = y;
 
 	//used in fastMulArray call
-	int lPlusHLen = highDigitLen + 1;
-	int *xlPlusxh = new int[lPlusHLen]();
-	int *ylPlusyh = new int[lPlusHLen]();
+	int digitSumLen = highDigitLen + 1;
+	int *xDigitSum = new int[digitSumLen]();
+	int *yDigitSum = new int[digitSumLen]();
 
 	//init sums as copies of xLow and yLow
 	for(int i = 0; i < lenOver2; ++i){ 
-		xlPlusxh[i] = x[i];
-		ylPlusyh[i] = y[i];
+		xDigitSum[i] = x[i];
+		yDigitSum[i] = y[i];
 	}
 
 	// z0,1,2 will become dests for base case
@@ -335,21 +335,21 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 	int *z2 = z2Shifted + twoLenOver2;
 
 	// add xLow to yLow and yLow to yHigh
-	addArray(xlPlusxh, xHigh, highDigitLen);
-	addArray(ylPlusyh, yHigh, highDigitLen);
-	//'normalize' xlPlusxh, ylPlusyh
+	addArray(xDigitSum, xHigh, highDigitLen);
+	addArray(yDigitSum, yHigh, highDigitLen);
+	//'normalize' xDigitSum, yDigitSum
 	while(true){
-		if(xlPlusxh[lPlusHLen - 1] != 0 || ylPlusyh[lPlusHLen - 1] != 0){break;}
-		--lPlusHLen;
+		if(xDigitSum[digitSumLen - 1] != 0 || yDigitSum[digitSumLen - 1] != 0){break;}
+		--digitSumLen;
 	}
 
   // 3 recursive calls to fastMulArray
 	fastMulArray(z0, xLow, yLow, lenOver2);
 	xLow = NULL;	
 	yLow = NULL;	
-	fastMulArray(z1, xlPlusxh, ylPlusyh, lPlusHLen);
-	delete [] xlPlusxh; 
-	delete [] ylPlusyh;
+	fastMulArray(z1, xDigitSum, yDigitSum, digitSumLen);
+	delete [] xDigitSum; 
+	delete [] yDigitSum;
 	fastMulArray(z2, xHigh, yHigh, highDigitLen);
 	xHigh = NULL; 
 	yHigh = NULL;
