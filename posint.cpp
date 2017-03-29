@@ -299,28 +299,28 @@ void debugArray(const int *x, int len){
 // x and y have the same length (len)
 // dest must have size (2*len) to store the result.
 void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
-				if(debug){
-					cout << "fastMulArray called" << endl;
-					cout << "len: " << len << endl;
-					for(int i = 0; i < len; i++){
-						cout << "*" << endl;
-					}
-					cout << "input x: ";
-					debugArray(x, len);
-					cout << "input y: ";
-					debugArray(y, len);
-				}
+				// if(debug){
+				// 	cout << "fastMulArray called" << endl;
+				// 	cout << "len: " << len << endl;
+				// 	for(int i = 0; i < len; i++){
+				// 		cout << "*" << endl;
+				// 	}
+				// 	cout << "input x: ";
+				// 	debugArray(x, len);
+				// 	cout << "input y: ";
+				// 	debugArray(y, len);
+				// }
 
 	if(len == 1) {
 		mulArray(dest, x, len, y, len);	
-					if(debug){
-						cout << "basecase achieved" << endl << endl;
-						debugArray(x, len);
-						cout << "multiplied with: ";
-						debugArray(y, len);
-						cout << " is: ";
-						debugArray(dest, len*2);
-					}
+					// if(debug){
+					// 	cout << "basecase achieved" << endl << endl;
+					// 	debugArray(x, len);
+					// 	cout << "multiplied with: ";
+					// 	debugArray(y, len);
+					// 	cout << " is: ";
+					// 	debugArray(dest, len*2);
+					// }
 
 		return;	
 	}
@@ -387,131 +387,131 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 		--lPlushLen;
 	}
 
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;
-					cout << "xlPlusxh = xLow + xHigh: ";
-					debugArray(xlPlusxh, subarrayLen + 1);
-					cout << "ylPlusyh = yLow + yHigh: ";
-					debugArray(ylPlusyh, subarrayLen + 1);
-				}
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;
+				// 	cout << "xlPlusxh = xLow + xHigh: ";
+				// 	debugArray(xlPlusxh, subarrayLen + 1);
+				// 	cout << "ylPlusyh = yLow + yHigh: ";
+				// 	debugArray(ylPlusyh, subarrayLen + 1);
+				// }
 	// 3 calls to karatsuba
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "calling fastMulArray for z0 with xLow, yLow" << endl;
-				}	
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "calling fastMulArray for z0 with xLow, yLow" << endl;
+				// }	
 	fastMulArray(z0, xLow, yLow, lenOver2);
 	delete [] xLow;	delete [] yLow;	
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "z0 = xLow * yLow: ";
-					debugArray(z0, zLen);
-				}
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "z0 = xLow * yLow: ";
+				// 	debugArray(z0, zLen);
+				// }
 
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "calling fastMulArray for z1 with xlPlusxh, ylPlusyh" << endl;
-				}	
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "calling fastMulArray for z1 with xlPlusxh, ylPlusyh" << endl;
+				// }	
 	fastMulArray(z1, xlPlusxh, ylPlusyh, lPlushLen);
-				if(debug){	
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;
-					debugArray(xlPlusxh, lPlushLen);
-					cout << " ";
-					debugArray(ylPlusyh, lPlushLen);					
-					cout << "z1 = xlPlusxh * ylPlusyh: ";
-					debugArray(z1, zLen);
-				}
+				// if(debug){	
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;
+				// 	debugArray(xlPlusxh, lPlushLen);
+				// 	cout << " ";
+				// 	debugArray(ylPlusyh, lPlushLen);					
+				// 	cout << "z1 = xlPlusxh * ylPlusyh: ";
+				// 	debugArray(z1, zLen);
+				// }
 
 	delete [] xlPlusxh; delete [] ylPlusyh;
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "calling fastMulArray for z2 with xhigh, yhigh" << endl;
-				}	
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "calling fastMulArray for z2 with xhigh, yhigh" << endl;
+				// }	
 	fastMulArray(z2, xHigh, yHigh, subarrayLen);
 	delete [] xHigh; delete [] yHigh;
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "z2 = xHigh * yHigh: ";
-					debugArray(z2, zLen);	
-				}
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "z2 = xHigh * yHigh: ";
+				// 	debugArray(z2, zLen);	
+				// }
 
 	// shift z2 for later use
 	int *z2Shifted = new int[zLen + twoLenOver2]();
 	for(int i = 0; i < zLen; i++){
 		z2Shifted[i + twoLenOver2] = z2[i];
 	}
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "z2 shifted: ";
-					debugArray(z2Shifted, zLen + twoLenOver2);
-				}
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "z2 shifted: ";
+				// 	debugArray(z2Shifted, zLen + twoLenOver2);
+				// }
 	// z1 - z2 - z0
 	int *z1_z2_z0 = new int[zLen]();
 	addArray(z1_z2_z0, z1, zLen);
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "z1 - z2 - z0 init (should be z1): ";
-					debugArray(z1_z2_z0, zLen);
-				}
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "z1 - z2 - z0 init (should be z1): ";
+				// 	debugArray(z1_z2_z0, zLen);
+				// }
 	subArray(z1_z2_z0, z2, zLen);
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "z1 - z2: ";
-					debugArray(z1_z2_z0, zLen);
-				}	
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "z1 - z2: ";
+				// 	debugArray(z1_z2_z0, zLen);
+				// }	
 	subArray(z1_z2_z0, z0, zLen);
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "z1 - z2 - z0: ";
-					debugArray(z1_z2_z0, zLen);
-				}
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "z1 - z2 - z0: ";
+				// 	debugArray(z1_z2_z0, zLen);
+				// }
 	// shift (z1-z2-z0)
 	int *z1_z2_z0Shifted = new int[zLen + lenOver2]();
 	for(int i = 0; i < zLen; i++){
 		z1_z2_z0Shifted[i + lenOver2] = z1_z2_z0[i];
 	}	
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "z1 - z2 - z0 shifted: ";
-					debugArray(z1_z2_z0Shifted, zLen + lenOver2);
-				}
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "z1 - z2 - z0 shifted: ";
+				// 	debugArray(z1_z2_z0Shifted, zLen + lenOver2);
+				// }
 
 	//  set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
 	//	same as(z2 with 2*m2 zeros to the left) + ((z1 - z2 - z0) with m2 zeros to the left) + z0
-	addArray(dest, z2Shifted, zLen + twoLenOver2);
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "added z2shifted to dest: ";
-					debugArray(dest, twoLen);
-				}	
+	addArray(dest, z2Shifted, twoLen);
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "added z2shifted to dest: ";
+				// 	debugArray(dest, twoLen);
+				// }	
 	addArray(dest, z1_z2_z0Shifted, zLen + lenOver2);
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;
-					cout << "z1z2z0shifted: ";
-					debugArray(z1_z2_z0Shifted,zLen + lenOver2);				
-					cout << "added z1_z2_z0shifted to dest: ";
-					debugArray(dest, twoLen);
-				}	
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;
+				// 	cout << "z1z2z0shifted: ";
+				// 	debugArray(z1_z2_z0Shifted,zLen + lenOver2);				
+				// 	cout << "added z1_z2_z0shifted to dest: ";
+				// 	debugArray(dest, twoLen);
+				// }	
 	addArray(dest, z0, zLen);
-				if(debug){
-					for(int i = 0; i < len; i++){cout << '\t';}
-					cout << "!!!!!!!!!!!!!!!" << endl;					
-					cout << "added z0 to dest: ";
-					debugArray(dest, twoLen);
-				}	
+				// if(debug){
+				// 	for(int i = 0; i < len; i++){cout << '\t';}
+				// 	cout << "!!!!!!!!!!!!!!!" << endl;					
+				// 	cout << "added z0 to dest: ";
+				// 	debugArray(dest, twoLen);
+				// }	
 
 	delete [] z0; delete [] z1; delete [] z2;
 	delete [] z1_z2_z0; delete [] z2Shifted; delete [] z1_z2_z0Shifted;
@@ -574,7 +574,7 @@ void PosInt::fastMul(const PosInt& x) {
   	//prepare digits for result
   	digits.clear();
   	digits.resize(inputlen * 2);
-  	for(int i = 0; i < inputlen * 2; i++){digits[i] = 0;}
+  	// for(int i = 0; i < inputlen * 2; i++){digits[i] = 0;}
   	//call my fastMulArray function
   	fastMulArray(&digits[0], mycopy, xcopy, inputlen);
 
