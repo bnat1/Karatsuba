@@ -424,12 +424,12 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 				// 	cout << "added z2shifted to dest: ";
 				// 	debugArray(dest, twoLen);
 				// }	
-	addArray(dest, z1_z2_z0Shifted, twoLen);
+	addArray(dest, z1_z2_z0Shifted, zLen + lenOver2);
 				// if(debug){
 				// 	cout << "added z1_z2_z3 to dest: ";
 				// 	debugArray(dest, twoLen);
 				// }	
-	addArray(dest, z0, twoLen);
+	addArray(dest, z0, zLen);
 				// if(debug){
 				// 	cout << "added z0 to dest: ";
 				// 	debugArray(dest, twoLen);
