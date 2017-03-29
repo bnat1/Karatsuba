@@ -316,7 +316,7 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 	const int *xLow = x;
 	const int *yLow = y;
 
-	//used in fastMulArray call
+	//for summation of low and high digits
 	int digitSumLen = highDigitLen + 1;
 	int *xDigitSum = new int[digitSumLen]();
 	int *yDigitSum = new int[digitSumLen]();
