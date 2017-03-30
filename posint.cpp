@@ -318,13 +318,15 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 
 	//for summation of low and high digits
 	int digitSumLen = highDigitLen + 1;
-	int *xDigitSum = new int[digitSumLen]();
-	int *yDigitSum = new int[digitSumLen]();
+	int *xDigitSum = new int[digitSumLen];
+	int *yDigitSum = new int[digitSumLen];
 
-	//init sums as copies of xLow and yLow
-	for(int i = 0; i < lenOver2; ++i){ 
-		xDigitSum[i] = x[i];
-		yDigitSum[i] = y[i];
+  xDigitSum[digitSumLen - 1] = 0;
+  yDigitSum[digitSumLen - 1] = 0;
+	//init sums as copies of xHigh and yHigh
+	for(int i = 0; i < highDigitLen; ++i){ 
+		xDigitSum[i] = x[i + lenOver2];
+		yDigitSum[i] = y[i + lenOver2];
 	}
 
 	// z0,1,2 will become dests for base case
@@ -335,8 +337,8 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 	int *z2 = z2Shifted + twoLenOver2;
 
 	// add xLow to yLow and yLow to yHigh
-	addArray(xDigitSum, xHigh, highDigitLen);
-	addArray(yDigitSum, yHigh, highDigitLen);
+	addArray(xDigitSum, xLow, lenOver2);
+	addArray(yDigitSum, yLow, lenOver2);
 	//'normalize' xDigitSum, yDigitSum
 	while(true){
 		if(xDigitSum[digitSumLen - 1] != 0 || yDigitSum[digitSumLen - 1] != 0){break;}
