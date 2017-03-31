@@ -331,10 +331,8 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 
 	// z0,1,2 will become dests for base case
 	int *z0 = new int[zLen]();
-	int *z1_z2_z0Shifted = new int[zLen + lenOver2]();
-	int *z1 = z1_z2_z0Shifted + lenOver2;
-	int *z2Shifted = new int[zLen + twoLenOver2]();
-	int *z2 = z2Shifted + twoLenOver2;
+	int *z1 = new int[zLen](); //shift with lenOver2
+	int *z2 = new int[zLen](); //will shift with twoLenOver2;
 
 	// add xLow to yLow and yLow to yHigh
 	addArray(xDigitSum, xLow, lenOver2);
@@ -361,14 +359,12 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
 	subArray(z1, z0, zLen);
 
 	//  set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
-	addArray(dest, z2Shifted, twoLen);
-	addArray(dest, z1_z2_z0Shifted, zLen + lenOver2);
+	addArray(dest + twoLenOver2, z2, twoLen - twoLenOver2);
+	addArray(dest + lenOver2, z1, zLen);
 	addArray(dest, z0, zLen);
 
-	z1 = NULL; 
-	z2 = NULL; 
-	delete [] z2Shifted; 
-	delete [] z1_z2_z0Shifted;
+	delete [] z2; 
+	delete [] z1;
 	delete [] z0; 
 
 	return;

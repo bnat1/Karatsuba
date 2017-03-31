@@ -24,7 +24,7 @@ int main() {
   // test1a.print(cout);
   
   //2148 ^ 2
-  PosInt test2a(32540);
+  PosInt test2a(3254450);
   PosInt test2b(1423458);
   test2a.fastMul(test2b);
   test2a.print_array(cout);
