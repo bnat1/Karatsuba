@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <typeinfo>
 #include <sys/time.h>
+#include <time.h>
 #include "posint.h"
 using namespace std;
 
@@ -19,31 +20,42 @@ int main() {
 	PosInt::setBase(10, 1);
 	srand(time(NULL));
 
-	cout.precision(2);
 	//timer
-	timespec startTime, stopTime, mulTimePassed, fastMulTimePassed;
+	clock_t startTime, stopTime, mulTimePassed, fastMulTimePassed;
 
-	int trialsPerDigit = 2;
-	int maxDigits = 20;
-	int totalMulTime;
-	int totalFastMulTime;
-	float avgTimePerDigitMul;
-	float avgTimePerDigitFastMul;	
-	bool crossOver;
-	PosInt ten(10);
+  int trialsPerDigit = 5;
+  int maxDigits = 50000;
+  float totalMulTime;
+  float totalFastMulTime;
+  float avgTimePerMul;
+  float avgTimePerFastMul;  
+  bool crossOver;
+  cout << "timing unit: 1 / " << CLOCKS_PER_SEC << " of a second" << endl;
+  cout << "maxDigits: " << maxDigits << endl;
+  cout << "trialsPerDigit: " << trialsPerDigit << endl;
+
 	PosInt lowerBound(1);
 	PosInt upperBound(10);
 	PosInt upperLowerDiff(upperBound);
+  PosInt ten(10);
+  PosInt oneHundred(100);
+  PosInt googol(ten);
+  googol.pow(oneHundred);
+  PosInt nine(9);
+  PosInt ninetyNine(99);
+  PosInt tenTo99th(ten);
+  tenTo99th.pow(ninetyNine); 
 	upperLowerDiff.sub(lowerBound);
 
 	PosInt mulTester;
 	PosInt fastMulTester;
 	PosInt x;
 	PosInt y;
-	for(int i = 1; i < maxDigits; ++i){
-		totalMulTime = 0;
-		totalFastMulTime = 0;
-		cout << "Trial #\t" << "# Digits\t" << "x\t" << "y\t" << "mul time (ns)\t" << "fastMul time (ns)\t" << endl; 
+
+	cout << "digits\t" << "average mul() time\t" << "average fastMul() time\t" << "crossover achieved?\t" << endl; 
+  for(int i = 1; i < maxDigits; i += 100){
+    totalMulTime = 0;
+    totalFastMulTime = 0;
 		for(int j = 0; j < trialsPerDigit; ++j){
 			x.rand(upperLowerDiff);
 			x.add(lowerBound);
@@ -51,43 +63,34 @@ int main() {
 			y.add(lowerBound);
 			mulTester.set(x);
 			//start timer
-			clock_gettime(CLOCK_REALTIME, &startTime);
+      startTime = clock();
 			mulTester.mul(y);
 			//stop timer
-			clock_gettime(CLOCK_REALTIME, &stopTime);
-			mulTimePassed.tv_nsec = stopTime.tv_nsec - startTime.tv_nsec;
-			totalMulTime += mulTimePassed.tv_nsec;
+      stopTime = clock();
+			mulTimePassed = stopTime - startTime;
+			totalMulTime += mulTimePassed;
 
 
 			fastMulTester.set(y);
 			//start timer
-			clock_gettime(CLOCK_REALTIME, &startTime);
+      startTime = clock();
 			fastMulTester.mul(y);
 			//stop timer
-			clock_gettime(CLOCK_REALTIME, &stopTime);
-			fastMulTimePassed.tv_nsec = stopTime.tv_nsec - startTime.tv_nsec;			
-			totalFastMulTime += fastMulTimePassed.tv_nsec;
-			
-			cout << j+1 << '\t' << i << '\t' << x << '\t' << y << '\t' << mulTimePassed.tv_nsec << '\t' << fastMulTimePassed.tv_nsec << '\t' << endl;			
+			stopTime = clock();
+      fastMulTimePassed = stopTime - startTime;      
+      totalFastMulTime += fastMulTimePassed;			
 		}
+		avgTimePerMul = totalMulTime / trialsPerDigit;
+		avgTimePerFastMul = totalFastMulTime / trialsPerDigit;
+		crossOver = avgTimePerFastMul < avgTimePerMul;
 
-		avgTimePerDigitMul = (float)totalMulTime / (float)i;
-		avgTimePerDigitFastMul = (float)totalFastMulTime / (float)i;
-		crossOver = avgTimePerDigitFastMul < avgTimePerDigitMul;
-
-		cout << "# Trials\t" << "# Digits\t" << "avg ns/mul\t" << "avg ns/fastMul\t" << "crossover\t" << endl; 
-
-		cout << trialsPerDigit << '\t' << i << '\t'; printf("%g\t", avgTimePerDigitMul); printf("%g\t", avgTimePerDigitFastMul);  cout << '\t' << crossOver << endl << endl; 	
+		cout << i << '\t'; printf("%.0f\t", avgTimePerMul); printf("%.0f\t", avgTimePerFastMul);  cout << crossOver << endl; 	
 
 		lowerBound.set(upperBound);
-		upperBound.mul(ten);
+    lowerBound.mul(tenTo99th);
+		upperBound.mul(googol);
 		upperLowerDiff.set(upperBound);
 		upperLowerDiff.sub(lowerBound);
-	}
-
+  if (i == 1){ i -= 1;}
+  }
 }
-  
-// want to output:
-
-//  | trial # | # digits | x	| y	| mul time (ns) | fastMul time (ns) | 
-//	|# trials | # digits | avg mul time |avg fast mul time | overall faster
