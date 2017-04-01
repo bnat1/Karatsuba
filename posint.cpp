@@ -288,86 +288,81 @@ void PosInt::mulArray
   }
 }
 void debugArray(const int *x, int len){
-	for(int i = 0; i < len; i ++){
-		cout << x[i] << " ";
-	}
-	cout << endl;
+  for(int i = 0; i < len; i ++){
+    cout << x[i] << " ";
+  }
+  cout << endl;
 }
 
 // Computes dest = x * y, digit-wise, using Karatsuba's method.
 // x and y have the same length (len)
 // dest must have size (2*len) to store the result.
 void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
-	// base case
+  // base case
   if(len == 1) {
-		mulArray(dest, x, len, y, len);	
-		return;	
-	}
+    mulArray(dest, x, len, y, len); 
+    return; 
+  }
 
-	int lenOver2 = len / 2;
-	int twoLenOver2 = 2 * lenOver2;
-	int highDigitLen = lenOver2 + len % 2;
-	int zLen = 2*(highDigitLen + 1);
-	int twoLen = 2 * len;
+  // helpful constants
+  const int lenOver2 = len / 2;
+  const int twoLenOver2 = 2 * lenOver2;
+  const int highDigitLen = lenOver2 + len % 2;
+  const int zLen = 2*(highDigitLen + 1);
+  const int twoLen = 2 * len;
 
-	// create subarrays of inputs to work with
-	const int *xHigh = x + lenOver2;
-	const int *yHigh = y + lenOver2;
-	const int *xLow = x;
-	const int *yLow = y;
+  // pointers to subarrays of inputs
+  const int *xHigh = x + lenOver2;
+  const int *yHigh = y + lenOver2;
+  const int *xLow = x;
+  const int *yLow = y;
 
-	//for summation of low and high digits
-	int digitSumLen = highDigitLen + 1;
-	int *xDigitSum = new int[digitSumLen];
-	int *yDigitSum = new int[digitSumLen];
-
+  // xDigitSum = xLow + xHigh, yDigitSum = yLow + yHigh;
+  int digitSumLen = highDigitLen + 1;
+  int *xDigitSum = new int[digitSumLen];
+  int *yDigitSum = new int[digitSumLen];
+  // zero out extra digit
   xDigitSum[digitSumLen - 1] = 0;
   yDigitSum[digitSumLen - 1] = 0;
-	//init sums as copies of xHigh and yHigh
-	for(int i = 0; i < highDigitLen; ++i){ 
-		xDigitSum[i] = x[i + lenOver2];
-		yDigitSum[i] = y[i + lenOver2];
-	}
+  // copy xHigh, yHigh for sum
+  for(int i = 0; i < highDigitLen; ++i){ 
+    xDigitSum[i] = xHigh[i];
+    yDigitSum[i] = yHigh[i];
+  }
+  addArray(xDigitSum, xLow, lenOver2);
+  addArray(yDigitSum, yLow, lenOver2);
+  // normalize xDigitSum, yDigitSum
+  for(;xDigitSum[digitSumLen - 1] == 0 && yDigitSum[digitSumLen - 1] == 0; --digitSumLen){}
 
-	// z0,1,2 will become dests for base case
-	int *z0 = new int[zLen]();
-	int *z1 = new int[zLen](); //shift with lenOver2
-	int *z2 = new int[zLen](); //will shift with twoLenOver2;
 
-	// add xLow to yLow and yLow to yHigh
-	addArray(xDigitSum, xLow, lenOver2);
-	addArray(yDigitSum, yLow, lenOver2);
-	//'normalize' xDigitSum, yDigitSum
-	while(true){
-		if(xDigitSum[digitSumLen - 1] != 0 || yDigitSum[digitSumLen - 1] != 0){break;}
-		--digitSumLen;
-	}
+  // 3 recursive calls to fastMulArray: xLow*yLow, xDigitSum*yDigitSum, xHigh*yHigh
+  int *z0 = new int[zLen]();
+  int *z1 = new int[zLen](); 
+  int *z2 = new int[zLen](); 
+  fastMulArray(z0, xLow, yLow, lenOver2);
+  xLow = NULL;  
+  yLow = NULL;  
+  fastMulArray(z1, xDigitSum, yDigitSum, digitSumLen);
+  delete [] xDigitSum; 
+  delete [] yDigitSum;
+  fastMulArray(z2, xHigh, yHigh, highDigitLen);
+  xHigh = NULL; 
+  yHigh = NULL;
 
-  // 3 recursive calls to fastMulArray
-	fastMulArray(z0, xLow, yLow, lenOver2);
-	xLow = NULL;	
-	yLow = NULL;	
-	fastMulArray(z1, xDigitSum, yDigitSum, digitSumLen);
-	delete [] xDigitSum; 
-	delete [] yDigitSum;
-	fastMulArray(z2, xHigh, yHigh, highDigitLen);
-	xHigh = NULL; 
-	yHigh = NULL;
+  // z1 = z1 - z2 - z0
+  subArray(z1, z2, zLen);
+  subArray(z1, z0, zLen);
 
-	// z1 - z2 - z0
-	subArray(z1, z2, zLen);
-	subArray(z1, z0, zLen);
 
-	//  set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
-	addArray(dest + twoLenOver2, z2, twoLen - twoLenOver2);
-	addArray(dest + lenOver2, z1, zLen);
-	addArray(dest, z0, zLen);
+  // set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
+  addArray(dest + twoLenOver2, z2, twoLen - twoLenOver2);
+  delete [] z2; 
+  addArray(dest + lenOver2, z1, zLen);
+  delete [] z1;
+  addArray(dest, z0, zLen);
+  delete [] z0; 
 
-	delete [] z2; 
-	delete [] z1;
-	delete [] z0; 
-
-	return;
+  return;
 }
 
 // this = this * x
@@ -397,41 +392,41 @@ void PosInt::mul(const PosInt& x) {
 // this = this * x, using Karatsuba's method
 void PosInt::fastMul(const PosInt& x) {
 
-	// make copy if multiplying this with self
-	if(this == &x) {
-		PosInt xcopy(x);
-		fastMul(xcopy);
-		return;
-	}
+  // make copy if multiplying this with self
+  if(this == &x) {
+    PosInt xcopy(x);
+    fastMul(xcopy);
+    return;
+  }
 
-	// if an input has no digits
-	int mylen = digits.size();
-	int xlen = x.digits.size();
-	if(mylen == 0 || xlen == 0) {
-		set(0);
-		return;
-	}
+  // if an input has no digits
+  int mylen = digits.size();
+  int xlen = x.digits.size();
+  if(mylen == 0 || xlen == 0) {
+    set(0);
+    return;
+  }
 
-	//create zero-padded input arrays
-	//least significant digits will be on the left
-	int inputlen = max(mylen, xlen);
-	int *mycopy = new int[inputlen]();
-	int *xcopy = new int[inputlen]();
+  //create zero-padded input arrays
+  //least significant digits will be on the left
+  int inputlen = max(mylen, xlen);
+  int *mycopy = new int[inputlen]();
+  int *xcopy = new int[inputlen]();
 
-	//fill input arrays with digits
-  	for (int i=0; i<mylen; ++i) mycopy[i] = digits[i];
-	for (int i=0; i<xlen; ++i) xcopy[i] = x.digits[i];  	
+  //fill input arrays with digits
+    for (int i=0; i<mylen; ++i) mycopy[i] = digits[i];
+  for (int i=0; i<xlen; ++i) xcopy[i] = x.digits[i];    
 
-  	//prepare digits for result
-  	digits.clear();
-  	digits.resize(mylen + xlen);
+    //prepare digits for result
+    digits.clear();
+    digits.resize(mylen + xlen);
 
-  	//call my fastMulArray function
-  	fastMulArray(&digits[0], mycopy, xcopy, inputlen);
+    //call my fastMulArray function
+    fastMulArray(&digits[0], mycopy, xcopy, inputlen);
 
-  	normalize();
-  	delete [] mycopy;
-  	delete [] xcopy;
+    normalize();
+    delete [] mycopy;
+    delete [] xcopy;
 }
 
 /******************** DIVISION ********************/
