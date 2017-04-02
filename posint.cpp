@@ -301,6 +301,7 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   // base case
   if(len == 1) {
     mulArray(dest, x, len, y, len); 
+    cout << "base case" << endl;
     return; 
   }
 
@@ -308,7 +309,7 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   const int lenOver2 = len / 2;
   const int twoLenOver2 = 2 * lenOver2;
   const int highDigitLen = lenOver2 + len % 2;
-  const int zLen = 2*(highDigitLen + 1);
+   int z1Len = 2*(highDigitLen + 1);
   const int twoLen = 2 * len;
 
   // pointers to subarrays of inputs
@@ -332,34 +333,45 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   addArray(xDigitSum, xLow, lenOver2);
   addArray(yDigitSum, yLow, lenOver2);
   // normalize xDigitSum, yDigitSum
-  for(;xDigitSum[digitSumLen - 1] == 0 && yDigitSum[digitSumLen - 1] == 0; --digitSumLen){}
-
-
+  for(;xDigitSum[digitSumLen - 1] == 0 && yDigitSum[digitSumLen - 1] == 0 && digitSumLen > 1; --digitSumLen){}
   // 3 recursive calls to fastMulArray: xLow*yLow, xDigitSum*yDigitSum, xHigh*yHigh
-  int *z0 = new int[zLen]();
-  int *z1 = new int[zLen](); 
-  int *z2 = new int[zLen](); 
+  int *z0 = new int[twoLenOver2]();
+  int *z1 = new int[z1Len](); //length is len + 1 for even, len + 2 for odd
+  int *z2 = new int[2*highDigitLen](); //length: len for even, len + 1 for odd
+  cout << "z0Len: " << twoLenOver2 << endl;
+  cout << "z1Len: " << z1Len << endl;
+  cout << "z2Len: " << 2*highDigitLen << endl;
+  
   fastMulArray(z0, xLow, yLow, lenOver2);
   xLow = NULL;  
   yLow = NULL;  
+  // cout << "second call" << endl;
   fastMulArray(z1, xDigitSum, yDigitSum, digitSumLen);
+  cout << "z1: ";
+  debugArray(z1, 2*digitSumLen);
   delete [] xDigitSum; 
   delete [] yDigitSum;
+  // cout << "third call" << endl;
   fastMulArray(z2, xHigh, yHigh, highDigitLen);
   xHigh = NULL; 
   yHigh = NULL;
 
   // z1 = z1 - z2 - z0
-  subArray(z1, z2, zLen);
-  subArray(z1, z0, zLen);
-
+  subArray(z1, z2, 2*highDigitLen);
+  subArray(z1, z0, twoLenOver2);
 
   // set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
-  addArray(dest + twoLenOver2, z2, twoLen - twoLenOver2);
+  cout << "adding arrays to dest" << endl;
+  cout << "assume dest len = 2len = " << twoLen << endl;
+  cout << "z2 shifted: " << twoLenOver2 + 2*highDigitLen << endl;
+  addArray(dest + twoLenOver2, z2, 2*highDigitLen);   
   delete [] z2; 
-  addArray(dest + lenOver2, z1, zLen);
+  for(;z1[z1Len - 1] == 0 && z1Len > 1; --z1Len){}
+  cout << "z1 shifted: " << lenOver2 + z1Len << endl; 
+  addArray(dest + lenOver2, z1, z1Len);
   delete [] z1;
-  addArray(dest, z0, zLen);
+  cout << "z0: " << twoLenOver2 << endl;
+  addArray(dest, z0, twoLenOver2);
   delete [] z0; 
 
   return;
