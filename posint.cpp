@@ -308,20 +308,26 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   const int lenOver2 = len / 2;
   const int twoLenOver2 = 2 * lenOver2;
   const int highDigitLen = lenOver2 + len % 2;
-  const int zLen = 2*(highDigitLen + 1);
-  const int twoLen = 2 * len;
+  const int z1Len = 2 * (highDigitLen + 1) - 1;
+  const int z2Len = 2 * highDigitLen;
+        int digitSumLen = highDigitLen + 1;
 
   // pointers to subarrays of inputs
   const int *xHigh = x + lenOver2;
   const int *yHigh = y + lenOver2;
   const int *xLow = x;
   const int *yLow = y;
+  
+  // stores results of recursive fastMul calls
+  int *z0 = new int[twoLenOver2]();
+  int *z1 = new int[z1Len](); 
+  int *z2 = new int[z2Len](); 
 
-  // xDigitSum = xLow + xHigh, yDigitSum = yLow + yHigh;
-  int digitSumLen = highDigitLen + 1;
+  // xDigitSum = xLow + xHigh
+  // yDigitSum = yLow + yHigh;
   int *xDigitSum = new int[digitSumLen];
   int *yDigitSum = new int[digitSumLen];
-  // zero out extra digit
+  // zero out extra digit before adding
   xDigitSum[digitSumLen - 1] = 0;
   yDigitSum[digitSumLen - 1] = 0;
   // copy xHigh, yHigh for sum
@@ -331,14 +337,10 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   }
   addArray(xDigitSum, xLow, lenOver2);
   addArray(yDigitSum, yLow, lenOver2);
-  // normalize xDigitSum, yDigitSum
-  for(;xDigitSum[digitSumLen - 1] == 0 && yDigitSum[digitSumLen - 1] == 0; --digitSumLen){}
-
+  // normalize before fastMul
+  for(;xDigitSum[digitSumLen - 1] == 0 && yDigitSum[digitSumLen - 1] == 0 && digitSumLen > 1; --digitSumLen){}
 
   // 3 recursive calls to fastMulArray: xLow*yLow, xDigitSum*yDigitSum, xHigh*yHigh
-  int *z0 = new int[zLen]();
-  int *z1 = new int[zLen](); 
-  int *z2 = new int[zLen](); 
   fastMulArray(z0, xLow, yLow, lenOver2);
   xLow = NULL;  
   yLow = NULL;  
@@ -350,16 +352,15 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   yHigh = NULL;
 
   // z1 = z1 - z2 - z0
-  subArray(z1, z2, zLen);
-  subArray(z1, z0, zLen);
-
+  subArray(z1, z2, z2Len);
+  subArray(z1, z0, twoLenOver2);
 
   // set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
-  addArray(dest + twoLenOver2, z2, twoLen - twoLenOver2);
+  addArray(dest + twoLenOver2, z2, z2Len);   
   delete [] z2; 
-  addArray(dest + lenOver2, z1, zLen);
+  addArray(dest + lenOver2, z1, z1Len);
   delete [] z1;
-  addArray(dest, z0, zLen);
+  addArray(dest, z0, twoLenOver2);
   delete [] z0; 
 
   return;
@@ -419,7 +420,7 @@ void PosInt::fastMul(const PosInt& x) {
 
     //prepare digits for result
     digits.clear();
-    digits.resize(mylen + xlen);
+    digits.resize(inputlen*2);
 
     //call my fastMulArray function
     fastMulArray(&digits[0], mycopy, xcopy, inputlen);
