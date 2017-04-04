@@ -8,6 +8,20 @@
 using namespace std;
 
 int main() {
+  
+	PosInt::setBase(10, 1);
+	srand(time(NULL));
+ //  //2148 ^ 2
+ //  PosInt test2a(1234);
+ //  PosInt test2b(54390801);
+ //  PosInt test2a2(1234);
+ //  test2a.fastMul(test2b);
+ //  test2a2.mul(test2b);
+ //  // test2a.print_array(cout);
+ //  test2a2.print(cout);
+ //  cout << endl;
+ //  test2a.print(cout);
+  
 
   // Set base to 16^4
   // This causes numbers to display in hex.  
@@ -17,10 +31,8 @@ int main() {
   // space-efficient to use the default, but then the
   // numbers will print in binary.
   // PosInt::setBase(16, 3);
-	PosInt::setBase(10, 1);
-	srand(time(NULL));
 
-	//timer
+	// timer
 	clock_t startTime, stopTime, mulTimePassed, fastMulTimePassed;
 
   int trialsPerDigit = 5;

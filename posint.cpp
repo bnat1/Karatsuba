@@ -315,13 +315,11 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   // pointers to subarrays of inputs
   const int *xHigh = x + lenOver2;
   const int *yHigh = y + lenOver2;
-  const int *xLow = x;
-  const int *yLow = y;
   
   // stores results of recursive fastMul calls
-  int *z0 = new int[twoLenOver2]();
-  int *z1 = new int[z1Len](); 
-  int *z2 = new int[z2Len](); 
+  int *z0 = new int[twoLenOver2];
+  int *z1 = new int[z1Len]; 
+  int *z2 = new int[z2Len]; 
 
   // xDigitSum = xLow + xHigh
   // yDigitSum = yLow + yHigh;
@@ -335,15 +333,13 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
     xDigitSum[i] = xHigh[i];
     yDigitSum[i] = yHigh[i];
   }
-  addArray(xDigitSum, xLow, lenOver2);
-  addArray(yDigitSum, yLow, lenOver2);
+  addArray(xDigitSum, x, lenOver2);
+  addArray(yDigitSum, y, lenOver2);
   // normalize before fastMul
   for(;xDigitSum[digitSumLen - 1] == 0 && yDigitSum[digitSumLen - 1] == 0 && digitSumLen > 1; --digitSumLen){}
 
   // 3 recursive calls to fastMulArray: xLow*yLow, xDigitSum*yDigitSum, xHigh*yHigh
-  fastMulArray(z0, xLow, yLow, lenOver2);
-  xLow = NULL;  
-  yLow = NULL;  
+  fastMulArray(z0, x, y, lenOver2);
   fastMulArray(z1, xDigitSum, yDigitSum, digitSumLen);
   delete [] xDigitSum; 
   delete [] yDigitSum;
@@ -356,10 +352,12 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   subArray(z1, z0, twoLenOver2);
 
   // set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
+  // addArray(dest + lenOver2, z1, z1Len);
+  for(int i = 0; i < lenOver2; ++i){ dest[i] = 0; }
+  for(int i = 0; i < z1Len; ++i){ dest[i+lenOver2] = z1[i]; }
+  delete [] z1;
   addArray(dest + twoLenOver2, z2, z2Len);   
   delete [] z2; 
-  addArray(dest + lenOver2, z1, z1Len);
-  delete [] z1;
   addArray(dest, z0, twoLenOver2);
   delete [] z0; 
 
@@ -395,39 +393,40 @@ void PosInt::fastMul(const PosInt& x) {
 
   // make copy if multiplying this with self
   if(this == &x) {
-    PosInt xcopy(x);
-    fastMul(xcopy);
+    PosInt xCopy(x);
+    fastMul(xCopy);
     return;
   }
 
   // if an input has no digits
-  int mylen = digits.size();
-  int xlen = x.digits.size();
-  if(mylen == 0 || xlen == 0) {
+  int myLen = digits.size();
+  int xLen = x.digits.size();
+  if(myLen == 0 || xLen == 0) {
     set(0);
     return;
   }
 
-  //create zero-padded input arrays
   //least significant digits will be on the left
-  int inputlen = max(mylen, xlen);
-  int *mycopy = new int[inputlen]();
-  int *xcopy = new int[inputlen]();
+  int inputLen = max(myLen, xLen);
+  int *myCopy = new int[inputLen];
+  int *xCopy = new int[inputLen];
 
-  //fill input arrays with digits
-    for (int i=0; i<mylen; ++i) mycopy[i] = digits[i];
-  for (int i=0; i<xlen; ++i) xcopy[i] = x.digits[i];    
+  //create zero-padded input arrays
+  for (int i = 0; i < myLen; ++i) myCopy[i] = digits[i];
+  for (int i = myLen; i < inputLen; ++i) {myCopy[i] = 0;}
+  for (int i = 0; i < xLen; ++i) xCopy[i] = x.digits[i];    
+  for (int i = xLen; i < inputLen; ++i) {xCopy[i] = 0;}
 
-    //prepare digits for result
-    digits.clear();
-    digits.resize(inputlen*2);
+  //prepare digits for result
+  digits.clear();
+  digits.resize(inputLen*2);
 
-    //call my fastMulArray function
-    fastMulArray(&digits[0], mycopy, xcopy, inputlen);
+  //call my fastMulArray function
+  fastMulArray(&digits[0], myCopy, xCopy, inputLen);
 
-    normalize();
-    delete [] mycopy;
-    delete [] xcopy;
+  normalize();
+  delete [] myCopy;
+  delete [] xCopy;
 }
 
 /******************** DIVISION ********************/
