@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <typeinfo>
-#include <sys/time.h>
 #include <time.h>
 #include "posint.h"
 using namespace std;
@@ -77,8 +76,6 @@ int main() {
     totalMulTime = 0;
     totalFastMulTime = 0;
 		for(int j = 0; j < trialsPerDigit; ++j){
-      // x.set(0);
-      // y.set(0);
 			x.rand(upperLowerDiff);
 			x.add(lowerBound);
 			y.rand(upperLowerDiff);

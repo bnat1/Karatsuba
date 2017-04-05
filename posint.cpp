@@ -305,7 +305,6 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   }
 
   // helpful constants
-  int twoLen = 2*len;
   int lenOver2 = len / 2;
   int twoLenOver2 = 2 * lenOver2;
   int highDigitLen = lenOver2 + len % 2;
