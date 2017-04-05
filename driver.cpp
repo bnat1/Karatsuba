@@ -45,7 +45,7 @@ int main() {
   float avgTimePerMul;
   float avgTimePerFastMul;  
   bool crossOver;
-  cout << "base: " << base << endl;
+  cout << "base: " << base << " ^ " << pow << endl;
   cout << "timing unit: 1 / " << CLOCKS_PER_SEC << " seconds" << endl;
   cout << "maxDigits: " << maxDigits << endl;
   cout << "trialsPerDigit: " << trialsPerDigit << endl;
