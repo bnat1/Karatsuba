@@ -305,21 +305,22 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   }
 
   // helpful constants
-  const int lenOver2 = len / 2;
-  const int twoLenOver2 = 2 * lenOver2;
-  const int highDigitLen = lenOver2 + len % 2;
-  const int z1Len = 2 * (highDigitLen + 1) - 1;
-  const int z2Len = 2 * highDigitLen;
-        int digitSumLen = highDigitLen + 1;
+  int twoLen = 2*len;
+  int lenOver2 = len / 2;
+  int twoLenOver2 = 2 * lenOver2;
+  int highDigitLen = lenOver2 + len % 2;
+  int z2Len = 2 * highDigitLen;
+  int digitSumLen = highDigitLen + 1;
+  int z1Len = 2 * digitSumLen;
 
   // pointers to subarrays of inputs
   const int *xHigh = x + lenOver2;
   const int *yHigh = y + lenOver2;
   
   // stores results of recursive fastMul calls
-  int *z0 = new int[twoLenOver2];
-  int *z1 = new int[z1Len]; 
-  int *z2 = new int[z2Len]; 
+  int *z0 = new int[twoLenOver2]();
+  int *z1 = new int[z1Len](); 
+  int *z2 = new int[z2Len](); 
 
   // xDigitSum = xLow + xHigh
   // yDigitSum = yLow + yHigh;
@@ -335,7 +336,7 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   }
   addArray(xDigitSum, x, lenOver2);
   addArray(yDigitSum, y, lenOver2);
-  // normalize before fastMul
+  // normalize sum before fastMul
   for(;xDigitSum[digitSumLen - 1] == 0 && yDigitSum[digitSumLen - 1] == 0 && digitSumLen > 1; --digitSumLen){}
 
   // 3 recursive calls to fastMulArray: xLow*yLow, xDigitSum*yDigitSum, xHigh*yHigh
@@ -351,9 +352,9 @@ void PosInt::fastMulArray (int* dest, const int* x, const int* y, int len) {
   subArray(z1, z2, z2Len);
   subArray(z1, z0, twoLenOver2);
 
-  // set dest to (z2*Base^(twoLenOver2))+((z1-z2-z0)*Base^(lenOver2))+(z0)
-  // addArray(dest + lenOver2, z1, z1Len);
-  for(int i = 0; i < lenOver2; ++i){ dest[i] = 0; }
+  //normalize z1 before adding to dest
+  for(;z1[z1Len - 1] == 0 && z1Len > 1; --z1Len){}
+  //copy z1 to dest
   for(int i = 0; i < z1Len; ++i){ dest[i+lenOver2] = z1[i]; }
   delete [] z1;
   addArray(dest + twoLenOver2, z2, z2Len);   
