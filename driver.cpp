@@ -8,7 +8,7 @@ using namespace std;
 
 int main() {
   
-  int base = 2;
+  int base = 16;
   int pow = 1;
 	PosInt::setBase(base, pow);
 	srand(time(NULL));
